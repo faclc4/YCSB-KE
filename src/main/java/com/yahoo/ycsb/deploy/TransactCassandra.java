@@ -1,3 +1,5 @@
+package com.yahoo.ycsb.deploy;
+
 import com.yahoo.ycsb.DB;
 import com.yahoo.ycsb.DBException;
 import pt.haslab.middleware.snapshot.Transaction;
