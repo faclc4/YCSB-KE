@@ -20,73 +20,66 @@ package com.yahoo.ycsb;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Set;
-import java.util.Enumeration;
-import java.util.Random;
 import java.util.Vector;
-
+import java.util.List;
 
 /**
- * Basic DB that just prints out the requested operations, instead of doing them against a database.
+ * A layer for accessing a database to be benchmarked. Each thread in the client
+ * will be given its own instance of whatever DB class is to be used in the test.
+ * This class should be constructed using a no-argument constructor, so we can
+ * load it dynamically. Any argument-based initialization should be
+ * done by init().
+ * 
+ * Note that YCSB does not make any use of the return codes returned by this class.
+ * Instead, it keeps a count of the return values and presents them to the user.
+ * 
+ * The semantics of methods such as insert, update and delete vary from database
+ * to database.  In particular, operations may or may not be durable once these
+ * methods commit, and some systems may return 'success' regardless of whether
+ * or not a tuple with a matching key existed before the call.  Rather than dictate
+ * the exact semantics of these methods, we recommend you either implement them
+ * to match the database's default semantics, or the semantics of your 
+ * target application.  For the sake of comparison between experiments we also 
+ * recommend you explain the semantics you chose when presenting performance results.
  */
-public class BasicDB extends DB
+public abstract class DB
 {
-	public static final String VERBOSE="basicdb.verbose";
-	public static final String VERBOSE_DEFAULT="true";
-	
-	public static final String SIMULATE_DELAY="basicdb.simulatedelay";
-	public static final String SIMULATE_DELAY_DEFAULT="0";
-	
-	
-	Random random;
-	boolean verbose;
-	int todelay;
+	/**
+	 * Properties for configuring this DB.
+	 */
+	Properties _p=new Properties();
 
-	public BasicDB()
+	/**
+	 * Set the properties for this DB.
+	 */
+	public void setProperties(Properties p)
 	{
-		random=new Random();
-		todelay=0;
+		_p=p;
+
 	}
 
-	
-	void delay()
+	/**
+	 * Get the set of properties for this DB.
+	 */
+	public Properties getProperties()
 	{
-		if (todelay>0)
-		{
-			try
-			{
-				Thread.sleep((long)random.nextInt(todelay));
-			}
-			catch (InterruptedException e)
-			{
-				//do nothing
-			}
-		}
+		return _p; 
 	}
 
 	/**
 	 * Initialize any state for this DB.
 	 * Called once per DB instance; there is one DB instance per client thread.
 	 */
-	@SuppressWarnings("unchecked")
-	public void init()
+	public void init() throws DBException
 	{
-		verbose=Boolean.parseBoolean(getProperties().getProperty(VERBOSE, VERBOSE_DEFAULT));
-		todelay=Integer.parseInt(getProperties().getProperty(SIMULATE_DELAY, SIMULATE_DELAY_DEFAULT));
-		
-		if (verbose)
-		{
-			System.out.println("***************** properties *****************");
-			Properties p=getProperties();
-			if (p!=null)
-			{
-				for (Enumeration e=p.propertyNames(); e.hasMoreElements(); )
-				{
-					String k=(String)e.nextElement();
-					System.out.println("\""+k+"\"=\""+p.getProperty(k)+"\"");
-				}
-			}
-			System.out.println("**********************************************");
-		}
+	}
+
+	/**
+	 * Cleanup any state for this DB.
+	 * Called once per DB instance; there is one DB instance per client thread.
+	 */
+	public void cleanup() throws DBException
+	{
 	}
 
 	/**
@@ -96,33 +89,10 @@ public class BasicDB extends DB
 	 * @param key The record key of the record to read.
 	 * @param fields The list of fields to read, or null for all of them
 	 * @param result A HashMap of field/value pairs for the result
-	 * @return Zero on success, a non-zero error code on error
+	 * @return Zero on success, a non-zero error code on error or "not found".
 	 */
-	public int read(String table, String key, Set<String> fields, HashMap<String,String> result)
-	{
-		delay();
+	public abstract int createKnowledgeBase(String table, String key, Set<String> fields, HashMap<String,String> result);
 
-		if (verbose)
-		{
-			System.out.print("READ "+table+" "+key+" [ ");
-			if (fields!=null)
-			{
-				for (String f : fields)
-				{
-					System.out.print(f+" ");
-				}
-			}
-			else
-			{
-				System.out.print("<all fields>");
-			}
-
-			System.out.println("]");
-		}
-
-		return 0;
-	}
-	
 	/**
 	 * Perform a range scan for a set of records in the database. Each field/value pair from the result will be stored in a HashMap.
 	 *
@@ -131,33 +101,10 @@ public class BasicDB extends DB
 	 * @param recordcount The number of records to read
 	 * @param fields The list of fields to read, or null for all of them
 	 * @param result A Vector of HashMaps, where each HashMap is a set field/value pairs for one record
-	 * @return Zero on success, a non-zero error code on error
+	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-	public int scan(String table, String startkey, int recordcount, Set<String> fields, Vector<HashMap<String,String>> result)
-	{
-		delay();
-
-		if (verbose)
-		{
-			System.out.print("SCAN "+table+" "+startkey+" "+recordcount+" [ ");
-			if (fields!=null)
-			{
-				for (String f : fields)
-				{
-					System.out.print(f+" ");
-				}
-			}
-			else
-			{
-				System.out.print("<all fields>");
-			}
-
-			System.out.println("]");
-		}
-
-		return 0;
-	}
-
+	public abstract int scan(String table, String startkey, int recordcount, Set<String> fields, Vector<HashMap<String,String>> result);
+	
 	/**
 	 * Update a record in the database. Any field/value pairs in the specified values HashMap will be written into the record with the specified
 	 * record key, overwriting any existing values with the same field name.
@@ -165,27 +112,20 @@ public class BasicDB extends DB
 	 * @param table The name of the table
 	 * @param key The record key of the record to write.
 	 * @param values A HashMap of field/value pairs to update in the record
-	 * @return Zero on success, a non-zero error code on error
+	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-	public int update(String table, String key, HashMap<String,String> values)
-	{
-		delay();
+	public abstract int update(String table, String key, HashMap<String,String> values);
 
-		if (verbose)
-		{
-			System.out.print("UPDATE "+table+" "+key+" [ ");
-			if (values!=null)
-			{
-				for (String k : values.keySet())
-				{
-					System.out.print(k+"="+values.get(k)+" ");
-				}
-			}
-			System.out.println("]");
-		}
-
-		return 0;
-	}
+    	/**
+	 * Update a record in the database. Any field/value pairs in the specified values HashMap will be written into the record with the specified
+	 * record key, overwriting any existing values with the same field name.
+	 *
+	 * @param table The name of the table
+	 * @param key The record key of the record to write.
+	 * @param values A HashMap of field/value pairs to update in the record
+	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
+	 */
+    public int updateMulti(String table, List<String> key, HashMap<String,String> values) { return 1;}
 
 	/**
 	 * Insert a record in the database. Any field/value pairs in the specified values HashMap will be written into the record with the specified
@@ -194,77 +134,16 @@ public class BasicDB extends DB
 	 * @param table The name of the table
 	 * @param key The record key of the record to insert.
 	 * @param values A HashMap of field/value pairs to insert in the record
-	 * @return Zero on success, a non-zero error code on error
+	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-	public int insert(String table, String key, HashMap<String,String> values)
-	{
-		delay();
-
-		if (verbose)
-		{
-			System.out.print("INSERT "+table+" "+key+" [ ");
-			if (values!=null)
-			{
-				for (String k : values.keySet())
-				{
-					System.out.print(k+"="+values.get(k)+" ");
-				}
-			}
-
-			System.out.println("]");
-		}
-
-		return 0;
-	}
-
+	public abstract int insert(String table, String key, HashMap<String,String> values);
 
 	/**
 	 * Delete a record from the database. 
 	 *
 	 * @param table The name of the table
 	 * @param key The record key of the record to delete.
-	 * @return Zero on success, a non-zero error code on error
+	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-	public int delete(String table, String key)
-	{
-		delay();
-
-		if (verbose)
-		{
-			System.out.println("DELETE "+table+" "+key);
-		}
-
-		return 0;
-	}
-
-	/**
-	 * Short test of BasicDB
-	 */
-	/*
-	public static void main(String[] args)
-	{
-		BasicDB bdb=new BasicDB();
-
-		Properties p=new Properties();
-		p.setProperty("Sky","Blue");
-		p.setProperty("Ocean","Wet");
-
-		bdb.setProperties(p);
-
-		bdb.init();
-
-		HashMap<String,String> fields=new HashMap<String,String>();
-		fields.put("A","X");
-		fields.put("B","Y");
-
-		bdb.read("table","key",null,null);
-		bdb.insert("table","key",fields);
-
-		fields=new HashMap<String,String>();
-		fields.put("C","Z");
-
-		bdb.update("table","key",fields);
-
-		bdb.delete("table","key");
-	}*/
+	public abstract int delete(String table, String key);
 }
