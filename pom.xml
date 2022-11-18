@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.example</groupId>
-    <artifactId>YCSB_maven</artifactId>
-    <version>1.0-pH1</version>
+    <artifactId>YCSB-KE</artifactId>
+    <version>0.1</version>
 
 
 
@@ -59,19 +59,19 @@
             <version>1.5.5</version>
         </dependency>
         <dependency>
-            <groupId>me.prettyprint</groupId>
-            <artifactId>hector-core</artifactId>
-            <version>1.0-5</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>5.2.9.RELEASE</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.cassandra</groupId>
-            <artifactId>cassandra-thrift</artifactId>
-            <version>1.0.10</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
         </dependency>
         <dependency>
-            <groupId>pt.haslab.middleware</groupId>
-            <artifactId>pH1</artifactId>
-            <version>0.1</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.11.1</version>
         </dependency>
     </dependencies>
 

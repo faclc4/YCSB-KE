@@ -92,7 +92,7 @@ fi
 # so that filenames w/ spaces are handled correctly in loops below
 IFS=
 
-for f in $YCSB_HOME/build/*.jar; do
+for f in $YCSB_HOME/target/*.jar; do
   CLASSPATH=${CLASSPATH}:$f
 done
 

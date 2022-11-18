@@ -139,7 +139,7 @@ class ClientThread extends Thread
 {
 	static Random random=new Random();
 
-	DB _db;
+	KE _db;
 	boolean _dotransactions;
 	Workload _workload;
 	int _opcount;
@@ -164,7 +164,7 @@ class ClientThread extends Thread
 	 * @param opcount the number of operations (transactions or inserts) to do
 	 * @param targetperthreadperms target number of operations per thread per ms
 	 */
-	public ClientThread(DB db, boolean dotransactions, Workload workload, int threadid, int threadcount, Properties props, int opcount, double targetperthreadperms)
+	public ClientThread(KE db, boolean dotransactions, Workload workload, int threadid, int threadcount, Properties props, int opcount, double targetperthreadperms)
 	{
 		//TODO: consider removing threadcount and threadid
 		_db=db;
@@ -190,7 +190,7 @@ class ClientThread extends Thread
 		{
 			_db.init();
 		}
-		catch (DBException e)
+		catch (KEException e)
 		{
 			e.printStackTrace();
 			e.printStackTrace(System.out);
@@ -268,7 +268,7 @@ class ClientThread extends Thread
 				while ( (_opcount==0) || (_opsdone<_opcount) )
 				{
 
-					if (!_workload.doInsert(_db,_workloadstate))
+					if (!_workload.doCreateAnswerKI(_db,_workloadstate))
 					{
 						break;
 					}
@@ -308,7 +308,7 @@ class ClientThread extends Thread
 		{
 			_db.cleanup();
 		}
-		catch (DBException e)
+		catch (KEException e)
 		{
 			e.printStackTrace();
 			e.printStackTrace(System.out);
@@ -702,10 +702,10 @@ public class Client
 
 		for (int threadid=0; threadid<threadcount; threadid++)
 		{
-			DB db=null;
+			KE db=null;
 			try
 			{
-				db=DBFactory.newDB(dbname,props);
+				db=KEFactory.newDB(dbname,props);
 			}
 			catch (UnknownDBException e)
 			{

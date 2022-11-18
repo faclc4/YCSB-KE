@@ -42,7 +42,7 @@ import java.util.List;
  * target application.  For the sake of comparison between experiments we also 
  * recommend you explain the semantics you chose when presenting performance results.
  */
-public abstract class DB
+public abstract class KE
 {
 	/**
 	 * Properties for configuring this DB.
@@ -70,7 +70,7 @@ public abstract class DB
 	 * Initialize any state for this DB.
 	 * Called once per DB instance; there is one DB instance per client thread.
 	 */
-	public void init() throws DBException
+	public void init() throws KEException
 	{
 	}
 
@@ -78,7 +78,7 @@ public abstract class DB
 	 * Cleanup any state for this DB.
 	 * Called once per DB instance; there is one DB instance per client thread.
 	 */
-	public void cleanup() throws DBException
+	public void cleanup() throws KEException
 	{
 	}
 
@@ -103,7 +103,7 @@ public abstract class DB
 	 * @param result A Vector of HashMaps, where each HashMap is a set field/value pairs for one record
 	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-	public abstract int scan(String table, String startkey, int recordcount, Set<String> fields, Vector<HashMap<String,String>> result);
+	public abstract int createPostKI(String table, String startkey, int recordcount, Set<String> fields, Vector<HashMap<String,String>> result);
 	
 	/**
 	 * Update a record in the database. Any field/value pairs in the specified values HashMap will be written into the record with the specified
@@ -114,9 +114,9 @@ public abstract class DB
 	 * @param values A HashMap of field/value pairs to update in the record
 	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-	public abstract int update(String table, String key, HashMap<String,String> values);
+	public abstract int createReactKI(String table, String key, HashMap<String,String> values);
 
-    	/**
+	/**
 	 * Update a record in the database. Any field/value pairs in the specified values HashMap will be written into the record with the specified
 	 * record key, overwriting any existing values with the same field name.
 	 *
@@ -125,7 +125,7 @@ public abstract class DB
 	 * @param values A HashMap of field/value pairs to update in the record
 	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-    public int updateMulti(String table, List<String> key, HashMap<String,String> values) { return 1;}
+    public int createAskKI(String table, String key, HashMap<String,String> values) { return 1;}
 
 	/**
 	 * Insert a record in the database. Any field/value pairs in the specified values HashMap will be written into the record with the specified
@@ -136,7 +136,7 @@ public abstract class DB
 	 * @param values A HashMap of field/value pairs to insert in the record
 	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-	public abstract int insert(String table, String key, HashMap<String,String> values);
+	public abstract int createAnswerKI(String table, String key, HashMap<String,String> values);
 
 	/**
 	 * Delete a record from the database. 
@@ -145,5 +145,5 @@ public abstract class DB
 	 * @param key The record key of the record to delete.
 	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-	public abstract int delete(String table, String key);
+	public abstract int deleteKnowledgeBase(String table, String key);
 }

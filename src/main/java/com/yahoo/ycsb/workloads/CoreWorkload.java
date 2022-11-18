@@ -126,62 +126,57 @@ public class CoreWorkload extends Workload
 	/**
 	 * The name of the property for the proportion of transactions that are reads.
 	 */
-	public static final String READ_PROPORTION_PROPERTY="readproportion";
+	public static final String CREATEKB_PROPORTION_PROPERTY="createKBproportion";
 	
 	/**
 	 * The default proportion of transactions that are reads.	
 	 */
-	public static final String READ_PROPORTION_PROPERTY_DEFAULT="0.95";
+	public static final String CREATEKB_PROPORTION_PROPERTY_DEFAULT="0.95";
 
 	/**
 	 * The name of the property for the proportion of transactions that are updates.
 	 */
-	public static final String UPDATE_PROPORTION_PROPERTY="updateproportion";
+	public static final String CREATE_ANSWER_KI_PROPORTION_PROPERTY="createKIAnswerproportion";
 	
 	/**
 	 * The default proportion of transactions that are updates.
 	 */
-	public static final String UPDATE_PROPORTION_PROPERTY_DEFAULT="0.05";
+	public static final String CREATE_ANSWER_KI_PROPORTION_PROPERTY_DEFAULT="0.05";
 
 	/**
 	 * The name of the property for the proportion of transactions that are inserts.
 	 */
-	public static final String INSERT_PROPORTION_PROPERTY="insertproportion";
+	public static final String CREATE_ASK_KI_PROPORTION_PROPERTY="createKIASKproportion";
 	
 	/**
 	 * The default proportion of transactions that are inserts.
 	 */
-	public static final String INSERT_PROPORTION_PROPERTY_DEFAULT="0.0";
+	public static final String CREATE_ASK_KI_PROPORTION_PROPERTY_DEFAULT="0.05";
 
 	/**
 	 * The name of the property for the proportion of transactions that are scans.
 	 */
-	public static final String SCAN_PROPORTION_PROPERTY="scanproportion";
+	public static final String CREATE_REACT_KI_PROPORTION_PROPERTY="createKIReactproportion";
 	
 	/**
 	 * The default proportion of transactions that are scans.
 	 */
-	public static final String SCAN_PROPORTION_PROPERTY_DEFAULT="0.0";
+	public static final String CREATE_REACT_KI_PROPORTION_PROPERTY_DEFAULT="0.05";
 	
 	/**
 	 * The name of the property for the proportion of transactions that are read-modify-write.
 	 */
-	public static final String READMODIFYWRITE_PROPORTION_PROPERTY="readmodifywriteproportion";
+	public static final String CREATE_POST_KI_PROPORTION_PROPERTY="createKIPostproportion";
 	
 	/**
 	 * The default proportion of transactions that are scans.
 	 */
-	public static final String READMODIFYWRITE_PROPORTION_PROPERTY_DEFAULT="0.0";
+	public static final String CREATE_POST_KI_PROPORTION_PROPERTY_DEFAULT="0.05";
 
-    	/**
+	/**
 	 * The name of the property for the proportion of transactions that are scans.
 	 */
     public static final String MULTI_UPDATE_PROPORTION_PROPERTY="multiupdateproportion";
-	
-	/**
-	 * The default proportion of transactions that are scans.
-	 */
-	public static final String MULTI_UPDATE_PROPORTION_PROPERTY_DEFAULT="0.0";
 
 	/**
 	 * The name of the property for the the distribution of requests across the keyspace. Options are "uniform", "zipfian" and "latest"
@@ -203,7 +198,6 @@ public class CoreWorkload extends Workload
 	 */
 	public static final String MAX_SCAN_LENGTH_PROPERTY_DEFAULT="1000";
 
-
 	/**
 	 * The name of the property for the scan length distribution. Options are "uniform" and "zipfian" (favoring short scans)
 	 */
@@ -214,9 +208,9 @@ public class CoreWorkload extends Workload
 	 */
 	public static final String SCAN_LENGTH_DISTRIBUTION_PROPERTY_DEFAULT="uniform";
 
-        public static final String MAX_TRANSACTION_LENGTH_PROPERTY="maxtransactionlength";
-        public static final String MAX_TRANSACTION_LENGTH_PROPERTY_DEFAULT="100";
-        public static final String TRANSACTION_LENGTH_DISTRIBUTION_PROPERTY="transactionlengthdistribution";
+	public static final String MAX_TRANSACTION_LENGTH_PROPERTY="maxtransactionlength";
+	public static final String MAX_TRANSACTION_LENGTH_PROPERTY_DEFAULT="100";
+	public static final String TRANSACTION_LENGTH_DISTRIBUTION_PROPERTY="transactionlengthdistribution";
 	public static final String TRANSACTION_LENGTH_DISTRIBUTION_PROPERTY_DEFAULT="uniform";
 
 	/**
@@ -275,12 +269,17 @@ public class CoreWorkload extends Workload
 		table = p.getProperty(TABLENAME_PROPERTY,TABLENAME_PROPERTY_DEFAULT);
 		fieldcount=Integer.parseInt(p.getProperty(FIELD_COUNT_PROPERTY,FIELD_COUNT_PROPERTY_DEFAULT));
 		fieldlength=Integer.parseInt(p.getProperty(FIELD_LENGTH_PROPERTY,FIELD_LENGTH_PROPERTY_DEFAULT));
-		double readproportion=Double.parseDouble(p.getProperty(READ_PROPORTION_PROPERTY,READ_PROPORTION_PROPERTY_DEFAULT));
-		double updateproportion=Double.parseDouble(p.getProperty(UPDATE_PROPORTION_PROPERTY,UPDATE_PROPORTION_PROPERTY_DEFAULT));
-		double insertproportion=Double.parseDouble(p.getProperty(INSERT_PROPORTION_PROPERTY,INSERT_PROPORTION_PROPERTY_DEFAULT));
-		double scanproportion=Double.parseDouble(p.getProperty(SCAN_PROPORTION_PROPERTY,SCAN_PROPORTION_PROPERTY_DEFAULT));
-		double readmodifywriteproportion=Double.parseDouble(p.getProperty(READMODIFYWRITE_PROPORTION_PROPERTY,READMODIFYWRITE_PROPORTION_PROPERTY_DEFAULT));
-		double multiupdateproportion=Double.parseDouble(p.getProperty(MULTI_UPDATE_PROPORTION_PROPERTY,MULTI_UPDATE_PROPORTION_PROPERTY_DEFAULT));
+
+
+		double createKBproportion=Double.parseDouble(p.getProperty(CREATEKB_PROPORTION_PROPERTY,CREATEKB_PROPORTION_PROPERTY_DEFAULT));
+
+		double createKIAnswerproportion=Double.parseDouble(p.getProperty(CREATE_ANSWER_KI_PROPORTION_PROPERTY,CREATE_ANSWER_KI_PROPORTION_PROPERTY_DEFAULT));
+		double createKIAskproportion=Double.parseDouble(p.getProperty(CREATE_ASK_KI_PROPORTION_PROPERTY,CREATE_ASK_KI_PROPORTION_PROPERTY_DEFAULT));
+
+		double createKIPostproportion=Double.parseDouble(p.getProperty(CREATE_POST_KI_PROPORTION_PROPERTY,CREATE_POST_KI_PROPORTION_PROPERTY_DEFAULT));
+		double createKIReactproportion=Double.parseDouble(p.getProperty(CREATE_REACT_KI_PROPORTION_PROPERTY,CREATE_REACT_KI_PROPORTION_PROPERTY_DEFAULT));
+
+
 		recordcount=Integer.parseInt(p.getProperty(Client.RECORD_COUNT_PROPERTY));
 		String requestdistrib=p.getProperty(REQUEST_DISTRIBUTION_PROPERTY,REQUEST_DISTRIBUTION_PROPERTY_DEFAULT);
 		int maxscanlength=Integer.parseInt(p.getProperty(MAX_SCAN_LENGTH_PROPERTY,MAX_SCAN_LENGTH_PROPERTY_DEFAULT));
@@ -305,35 +304,31 @@ public class CoreWorkload extends Workload
 
 		keysequence=new CounterGenerator(insertstart);
 		operationchooser=new DiscreteGenerator();
-		if (readproportion>0)
+		if (createKBproportion>0)
 		{
-			operationchooser.addValue(readproportion,"READ");
+			operationchooser.addValue(createKBproportion,"CREATE KNOWLEDGE BASE");
 		}
 
-		if (updateproportion>0)
+		if (createKIAnswerproportion>0)
 		{
-			operationchooser.addValue(updateproportion,"UPDATE");
+			operationchooser.addValue(createKIAnswerproportion,"CREATE ANSWER KI");
 		}
 
-		if (insertproportion>0)
+		if (createKIAskproportion>0)
 		{
-			operationchooser.addValue(insertproportion,"INSERT");
+			operationchooser.addValue(createKIAskproportion,"CREATE ASK KI");
 		}
 		
-		if (scanproportion>0)
+		if (createKIPostproportion>0)
 		{
-			operationchooser.addValue(scanproportion,"SCAN");
+			operationchooser.addValue(createKIPostproportion,"CREATE POST KI");
 		}
 		
-		if (readmodifywriteproportion>0)
+		if (createKIReactproportion>0)
 		{
-			operationchooser.addValue(readmodifywriteproportion,"READMODIFYWRITE");
+			operationchooser.addValue(createKIReactproportion,"CREATE REACT KI");
 		}
 
-		if (multiupdateproportion>0)
-		{
-			operationchooser.addValue(multiupdateproportion,"MULTIUPDATE");
-		}
 
 		transactioninsertkeysequence=new CounterGenerator(recordcount);
 		if (requestdistrib.compareTo("uniform")==0)
@@ -350,7 +345,7 @@ public class CoreWorkload extends Workload
 			//just ignore it and pick another key. this way, the size of the keyspace doesn't change from the perspective of the scrambled zipfian generator
 			
 			int opcount=Integer.parseInt(p.getProperty(Client.OPERATION_COUNT_PROPERTY));
-			int expectednewkeys=(int)(((double)opcount)*insertproportion*2.0); //2 is fudge factor
+			int expectednewkeys=(int)(((double)opcount)*createKBproportion*2.0); //2 is fudge factor
 			
 			keychooser=new ScrambledZipfianGenerator(recordcount+expectednewkeys);
 		}
@@ -408,7 +403,7 @@ public class CoreWorkload extends Workload
 	 * other, and it will be difficult to reach the target throughput. Ideally, this function would have no side
 	 * effects other than DB operations.
 	 */
-	public boolean doInsert(DB db, Object threadstate)
+	public boolean doCreateAnswerKI(KE db, Object threadstate)
 	{
 		int keynum=keysequence.nextInt();
 		if (!orderedinserts)
@@ -423,7 +418,7 @@ public class CoreWorkload extends Workload
 			String data=Utils.ASCIIString(fieldlength);
 			values.put(fieldkey,data);
 		}
-		if (db.insert(table,dbkey,values) == 0)
+		if (db.createAnswerKI(table,dbkey,values) == 0)
 			return true;
 		else
 			return false;
@@ -435,40 +430,41 @@ public class CoreWorkload extends Workload
 	 * other, and it will be difficult to reach the target throughput. Ideally, this function would have no side
 	 * effects other than DB operations.
 	 */
-	public boolean doTransaction(DB db, Object threadstate)
+	public boolean doTransaction(KE db, Object threadstate)
 	{
 		String op=operationchooser.nextString();
 
-		if (op.compareTo("READ")==0)
+		if (op.compareTo("CREATE ANSWER KI")==0)
 		{
-			doTransactionRead(db);
+			doCreateAnswerKI(db);
 		}
-		else if (op.compareTo("UPDATE")==0)
+		else if (op.compareTo("CREATE ASK KI")==0)
 		{
-			doTransactionUpdate(db);
+			doCreateAskKI(db);
 		}
-		else if (op.compareTo("INSERT")==0)
+		else if (op.compareTo("CREATE REACT KI")==0)
 		{
-			doTransactionInsert(db);
+			doCreateReactKI(db);
 		}
-		else if (op.compareTo("SCAN")==0)
+		else if (op.compareTo("CREATE POST KI")==0)
 		{
-			doTransactionScan(db);
+			doCreatePostKI(db);
 		}
- 		else if (op.compareTo("MULTIUPDATE")==0)
+ 		else if (op.compareTo("CREATE KNOWLEDGE BASE")==0)
 		{
-			doTransactionMultiUpdate(db);
+			doCreateKnowledgeBase(db);
 		}
 
 		else
 		{
-			doTransactionReadModifyWrite(db);
+			//doTransactionReadModifyWrite(db);
 		}
 		
 		return true;
 	}
 
-	public void doTransactionRead(DB db)
+	//read
+	public void doCreateKnowledgeBase(KE db)
 	{
 		//choose a random key
 		int keynum;
@@ -495,10 +491,15 @@ public class CoreWorkload extends Workload
 			fields.add(fieldname);
 		}
 
-		db.read(table,keyname,fields,new HashMap<String,String>());
+		long st=System.currentTimeMillis();
+		db.createKnowledgeBase(table,keyname,fields,new HashMap<String,String>());
+		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
 	}
-	
-	public void doTransactionReadModifyWrite(DB db)
+
+	//readModifyWrite
+	public void doCreateAskKI(KE db)
 	{
 		//choose a random key
 		int keynum;
@@ -548,17 +549,14 @@ public class CoreWorkload extends Workload
 		//do the transaction
 		
 		long st=System.currentTimeMillis();
-
-		db.read(table,keyname,fields,new HashMap<String,String>());
-		
-		db.update(table,keyname,values);
-
+		db.createAskKI(table,keyname,new HashMap<String,String>());
 		long en=System.currentTimeMillis();
-		
-		Measurements.getMeasurements().measure("READ-MODIFY-WRITE", (int)(en-st));
+
+		Measurements.getMeasurements().measure("CREATE ASK KI", (int)(en-st));
 	}
-	
-	public void doTransactionScan(DB db)
+
+	//scan
+	public void doCreatePostKI(KE db)
 	{
 		//choose a random key
 		int keynum;
@@ -588,10 +586,16 @@ public class CoreWorkload extends Workload
 			fields.add(fieldname);
 		}
 
-		db.scan(table,startkeyname,len,fields,new Vector<HashMap<String,String>>());
+		long st=System.currentTimeMillis();
+		db.createPostKI(table,startkeyname,len,fields,new Vector<HashMap<String,String>>());
+		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE POST KI", (int)(en-st));
+
 	}
 
-	public void doTransactionUpdate(DB db)
+	//Update
+	public void doCreateReactKI(KE db)
 	{
 		//choose a random key
 		int keynum;
@@ -627,10 +631,15 @@ public class CoreWorkload extends Workload
 		   values.put(fieldname,data);
 		}
 
-		db.update(table,keyname,values);
+		long st=System.currentTimeMillis();
+		db.createReactKI(table,keyname,values);
+		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE REACT KI", (int)(en-st));
 	}
 
-	public void doTransactionMultiUpdate(DB db)
+	//updateMulti
+	public void doRemoveKnowledgeBase(KE db)
 	{
 	    //choose a random scan length
 	    int len=10; //transactionlength.nextInt();
@@ -672,10 +681,12 @@ public class CoreWorkload extends Workload
 		   values.put(fieldname,data);
 		}
 
-		db.updateMulti(table,keys,values);
+		//db.deleteKnowledgeBase(table,keys);
+
 	}
 
-	public void doTransactionInsert(DB db)
+	//insert
+	public void doCreateAnswerKI(KE db)
 	{
 		//choose the next key
 		int keynum=transactioninsertkeysequence.nextInt();
@@ -692,6 +703,11 @@ public class CoreWorkload extends Workload
 			String data=Utils.ASCIIString(fieldlength);
 			values.put(fieldkey,data);
 		}
-		db.insert(table,dbkey,values);
+
+		long st=System.currentTimeMillis();
+		db.createAnswerKI(table,dbkey,values);
+		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE ANSWER KI", (int)(en-st));
 	}
 }

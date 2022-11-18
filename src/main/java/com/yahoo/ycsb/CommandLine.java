@@ -191,12 +191,12 @@ public class CommandLine
 
 	 ClassLoader classLoader = CommandLine.class.getClassLoader();
 
-	 DB db=null;
+	 KE db=null;
 
 	 try 
 	 {
 	    Class dbclass = classLoader.loadClass(dbname);
-	    db=(DB)dbclass.newInstance();
+	    db=(KE)dbclass.newInstance();
 	 }
 	 catch (Exception e) 
 	 {  
@@ -209,7 +209,7 @@ public class CommandLine
 	 {
 	    db.init();
 	 }
-	 catch (DBException e)
+	 catch (KEException e)
 	 {
 	    e.printStackTrace();
 	    System.exit(0);
@@ -294,7 +294,7 @@ public class CommandLine
 		  }
 		  
 		  HashMap<String,String> result=new HashMap<String,String>();
-		  int ret=db.read(table,tokens[1],fields,result);
+		  int ret=db.createKnowledgeBase(table,tokens[1],fields,result);
 		  System.out.println("Return code: "+ret);
 		  for (Map.Entry<String,String> ent : result.entrySet())
 		  {
@@ -323,7 +323,7 @@ public class CommandLine
 		  }
 		  
 		  Vector<HashMap<String,String>> results=new Vector<HashMap<String,String>>();
-		  int ret=db.scan(table,tokens[1],Integer.parseInt(tokens[2]),fields,results);
+		  int ret=db.createPostKI(table,tokens[1],Integer.parseInt(tokens[2]),fields,results);
 		  System.out.println("Return code: "+ret);
 		  int record=0;
 		  if (results.size()==0)
@@ -361,7 +361,7 @@ public class CommandLine
 		     values.put(nv[0],nv[1]);
 		  }
 
-		  int ret=db.update(table,tokens[1],values);
+		  int ret=db.createReactKI(table,tokens[1],values);
 		  System.out.println("Return code: "+ret);
 	       }		  
 	    }
@@ -381,7 +381,7 @@ public class CommandLine
 		     values.put(nv[0],nv[1]);
 		  }
 
-		  int ret=db.insert(table,tokens[1],values);
+		  int ret=db.createAnswerKI(table,tokens[1],values);
 		  System.out.println("Return code: "+ret);
 	       }		  
 	    }
@@ -393,7 +393,7 @@ public class CommandLine
 	       }
 	       else 
 	       {
-		  int ret=db.delete(table,tokens[1]);
+		  int ret=db.deleteKnowledgeBase(table,tokens[1]);
 		  System.out.println("Return code: "+ret);
 	       }		  
 	    }

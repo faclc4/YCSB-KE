@@ -22,21 +22,21 @@ import java.util.Properties;
 /**
  * Creates a DB layer by dynamically classloading the specified DB class.
  */
-public class DBFactory
+public class KEFactory
 {
       @SuppressWarnings("unchecked")
-	public static DB newDB(String dbname, Properties properties) throws UnknownDBException
+	public static KE newDB(String dbname, Properties properties) throws UnknownDBException
       {
-	 ClassLoader classLoader = DBFactory.class.getClassLoader();
+	 ClassLoader classLoader = KEFactory.class.getClassLoader();
 
-	 DB ret=null;
+	 KE ret=null;
 
 	 try 
 	 {
-	    Class dbclass = classLoader.loadClass(dbname);
+	    Class keclass = classLoader.loadClass(dbname);
 	    //System.out.println("dbclass.getName() = " + dbclass.getName());
 	    
-	    ret=(DB)dbclass.newInstance();
+	    ret=(KE)keclass.newInstance();
 	 }
 	 catch (Exception e) 
 	 {  
@@ -46,7 +46,7 @@ public class DBFactory
 	 
 	 ret.setProperties(properties);
 
-	 return new DBWrapper(ret);
+	 return new KEWrapper(ret);
       }
       
 }

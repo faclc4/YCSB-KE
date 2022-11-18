@@ -1,16 +1,9 @@
-HAS TO BE UPDATED AND TRANSLATED
+COMPILE AND RUN THE BENCHMARK:
 
-COMPILAR E CORRER YCSB --> MIDDLEWARE
+	COMPILE:
+	mnv clean compile package install
 
-	COMPILAR:
-	javac -cp .:build/ycsb.jar:dist/Middleware.jar:dist/lib/* TransactCassandra.java
-	
-	CARREGAR DADOS PARA O MIDDLEWARE:
-	./bin/ycsb.sh com.yahoo.ycsb.Client -p columnfamily=data -load -db CassandraBulk -P workloads/workloada -s -threadser 1
-	
-	EFETUAR TESTE WORLOAD NO MIDDLEWARE:
-	./bin/ycsb.sh com.yahoo.ycsb.Client -p columnfamily=data -t -db TransactCassandra -P workloads/workloada -s -threads 1
-
-    The Transact and CassandraBluk classes are included within the code.
-    They can also be used externally but the package in those classes needs to be removed. 
+    RUN THE BENCHMARK:
+    ./bin/ycsb.sh com.yahoo.ycsb.Client -p columnfamily=data -t -db com.yahoo.ycsb.KE_Test -P workloads/workloada -s -threads 1
+ 
 
