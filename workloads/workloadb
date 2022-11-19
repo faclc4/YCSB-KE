@@ -29,11 +29,11 @@ workload=com.yahoo.ycsb.workloads.CoreWorkload
 readallfields=true
 
 
-createKBproportion=0.2
-createKIAnswerproportion=0.2
-createKIASKproportion=0.2
-createKIReactproportion=0.2
-createKIPostproportion=0.2
+createKBproportion=1
+createKIAnswerproportion=0
+createKIASKproportion=0
+createKIReactproportion=0
+createKIPostproportion=0
 
 
 requestdistribution=zipfian

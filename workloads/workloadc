@@ -23,17 +23,17 @@
 #   Request distribution: zipfian
 
 recordcount=100000
-operationcount=50000
+operationcount=1000
 workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true
 
 
-createKBproportion=0.2
-createKIAnswerproportion=0.2
-createKIASKproportion=0.2
-createKIReactproportion=0.2
-createKIPostproportion=0.2
+createKBproportion=0.5
+createKIAnswerproportion=0.5
+createKIASKproportion=0
+createKIReactproportion=0
+createKIPostproportion=0
 
 
 requestdistribution=zipfian

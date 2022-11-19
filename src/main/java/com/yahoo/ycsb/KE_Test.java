@@ -1,14 +1,37 @@
 package com.yahoo.ycsb;
 
+import com.yahoo.ycsb.schemes.CreateSmartConnector;
+
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Vector;
 
 public class KE_Test extends KE{
+
+    private String KE_HOST="http://localhost:8280/rest";
+    private static KEClient keClient;
+
+    public static final int OK=0;
+    public static final int ERROR=-1;
+
+    @Override
+    public void init() throws KEException{
+        this.keClient = new KEClient(KE_HOST);
+    }
+
     @Override
     public int createKnowledgeBase(String table, String key, Set<String> fields, HashMap<String, String> result) {
         System.out.println("I am a create KnowledgeBase Operation");
-        return 0;
+        CreateSmartConnector createSmartConnector = new CreateSmartConnector(table+key,table+key,"test"+key,30,false);
+        int rep = keClient.createSmartConnector(createSmartConnector);
+        if(rep==200){
+            System.out.println("200");
+            return OK;
+        }
+        else{
+            System.out.println(rep);
+            return ERROR;
+        }
     }
 
     @Override
