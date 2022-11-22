@@ -125,7 +125,7 @@ public abstract class KE
 	 * @param values A HashMap of field/value pairs to update in the record
 	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
-    public int createAskKI(String table, String key, HashMap<String,String> values) { return 1;}
+    public abstract int createAskKI(String table, String key, HashMap<String,String> values);
 
 	/**
 	 * Insert a record in the database. Any field/value pairs in the specified values HashMap will be written into the record with the specified

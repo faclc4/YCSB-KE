@@ -547,10 +547,16 @@ public class CoreWorkload extends Workload
 		}
 
 		//do the transaction
-		
+
 		long st=System.currentTimeMillis();
-		db.createAskKI(table,keyname,new HashMap<String,String>());
+		db.createKnowledgeBase(table,keyname,fields,new HashMap<String,String>());
 		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
+		
+		st=System.currentTimeMillis();
+		db.createAskKI(table,keyname,new HashMap<String,String>());
+		en=System.currentTimeMillis();
 
 		Measurements.getMeasurements().measure("CREATE ASK KI", (int)(en-st));
 	}
@@ -587,8 +593,14 @@ public class CoreWorkload extends Workload
 		}
 
 		long st=System.currentTimeMillis();
-		db.createPostKI(table,startkeyname,len,fields,new Vector<HashMap<String,String>>());
+		db.createKnowledgeBase(table,startkeyname,fields,new HashMap<String,String>());
 		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		db.createPostKI(table,startkeyname,len,fields,new Vector<HashMap<String,String>>());
+		en=System.currentTimeMillis();
 
 		Measurements.getMeasurements().measure("CREATE POST KI", (int)(en-st));
 
@@ -632,8 +644,14 @@ public class CoreWorkload extends Workload
 		}
 
 		long st=System.currentTimeMillis();
-		db.createReactKI(table,keyname,values);
+		db.createKnowledgeBase(table,keyname,null,new HashMap<String,String>());
 		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		db.createReactKI(table,keyname,values);
+		en=System.currentTimeMillis();
 
 		Measurements.getMeasurements().measure("CREATE REACT KI", (int)(en-st));
 	}
@@ -705,8 +723,14 @@ public class CoreWorkload extends Workload
 		}
 
 		long st=System.currentTimeMillis();
-		db.createAnswerKI(table,dbkey,values);
+		db.createKnowledgeBase(table,dbkey,null,new HashMap<String,String>());
 		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		db.createAnswerKI(table,dbkey,values);
+		en=System.currentTimeMillis();
 
 		Measurements.getMeasurements().measure("CREATE ANSWER KI", (int)(en-st));
 	}
