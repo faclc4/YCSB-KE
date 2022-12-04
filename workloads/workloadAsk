@@ -37,8 +37,8 @@ createKIReactproportion=0
 createKIPostproportion=0
 
 ########## Test ASK-ANSWER and POST-REACT
-handlePostproportion=1
-handleAskproportion=0
+handlePostproportion=0
+handleAskproportion=1
 handleReactproportion=0
 handleAnswerproportion=0
 

@@ -28,12 +28,19 @@ workload=com.yahoo.ycsb.workloads.CoreWorkload
 
 readallfields=true
 
+########## Test KB and KIs creation
 
-createKBproportion=0.5
-createKIAnswerproportion=0.5
-createKIASKproportion=0
-createKIReactproportion=0
-createKIPostproportion=0
+createKBproportion=0.2
+createKIAnswerproportion=0.2
+createKIASKproportion=0.2
+createKIReactproportion=0.2
+createKIPostproportion=0.2
+
+########## Test ASK-ANSWER and POST-REACT
+handlePostproportion=0
+handleAskproportion=0
+handleReactproportion=0
+handleAnswerproportion=0
 
 
 requestdistribution=zipfian

@@ -127,60 +127,43 @@ public class CoreWorkload extends Workload
 	 * The name of the property for the proportion of transactions that are reads.
 	 */
 	public static final String CREATEKB_PROPORTION_PROPERTY="createKBproportion";
-	
-	/**
-	 * The default proportion of transactions that are reads.	
-	 */
+
 	public static final String CREATEKB_PROPORTION_PROPERTY_DEFAULT="0.95";
 
-	/**
-	 * The name of the property for the proportion of transactions that are updates.
-	 */
 	public static final String CREATE_ANSWER_KI_PROPORTION_PROPERTY="createKIAnswerproportion";
-	
-	/**
-	 * The default proportion of transactions that are updates.
-	 */
+
 	public static final String CREATE_ANSWER_KI_PROPORTION_PROPERTY_DEFAULT="0.05";
 
-	/**
-	 * The name of the property for the proportion of transactions that are inserts.
-	 */
 	public static final String CREATE_ASK_KI_PROPORTION_PROPERTY="createKIASKproportion";
-	
-	/**
-	 * The default proportion of transactions that are inserts.
-	 */
+
 	public static final String CREATE_ASK_KI_PROPORTION_PROPERTY_DEFAULT="0.05";
 
-	/**
-	 * The name of the property for the proportion of transactions that are scans.
-	 */
 	public static final String CREATE_REACT_KI_PROPORTION_PROPERTY="createKIReactproportion";
-	
-	/**
-	 * The default proportion of transactions that are scans.
-	 */
+
 	public static final String CREATE_REACT_KI_PROPORTION_PROPERTY_DEFAULT="0.05";
-	
-	/**
-	 * The name of the property for the proportion of transactions that are read-modify-write.
-	 */
+
 	public static final String CREATE_POST_KI_PROPORTION_PROPERTY="createKIPostproportion";
-	
-	/**
-	 * The default proportion of transactions that are scans.
-	 */
+
+	public static final String HANDLE_POST_KI= "handlePostproportion";
+
+	public static final String HANDLE_POST_KI_PROPERTY_DEFAULT="0.1";
+
+	public static final String HANDLE_ASK_KI= "handleAskproportion";
+
+	public static final String HANDLE_ASK_KI_PROPERTY_DEFAULT="0.1";
+
+	public static final String HANDLE_ANSWER_KI= "handleAnswerproportion";
+
+	public static final String HANDLE_ANSWER_KI_PROPERTY_DEFAULT="0.1";
+
+	public static final String HANDLE_REACT_KI= "handleReactproportion";
+
+	public static final String HANDLE_REACT_KI_PROPERTY_DEFAULT="0.1";
+
 	public static final String CREATE_POST_KI_PROPORTION_PROPERTY_DEFAULT="0.05";
 
-	/**
-	 * The name of the property for the proportion of transactions that are scans.
-	 */
     public static final String MULTI_UPDATE_PROPORTION_PROPERTY="multiupdateproportion";
 
-	/**
-	 * The name of the property for the the distribution of requests across the keyspace. Options are "uniform", "zipfian" and "latest"
-	 */
 	public static final String REQUEST_DISTRIBUTION_PROPERTY="requestdistribution";
 	
 	/**
@@ -279,6 +262,10 @@ public class CoreWorkload extends Workload
 		double createKIPostproportion=Double.parseDouble(p.getProperty(CREATE_POST_KI_PROPORTION_PROPERTY,CREATE_POST_KI_PROPORTION_PROPERTY_DEFAULT));
 		double createKIReactproportion=Double.parseDouble(p.getProperty(CREATE_REACT_KI_PROPORTION_PROPERTY,CREATE_REACT_KI_PROPORTION_PROPERTY_DEFAULT));
 
+		double handleAskproportion = Double.parseDouble(p.getProperty(HANDLE_ASK_KI,HANDLE_ASK_KI_PROPERTY_DEFAULT));
+		double handleAnswerproportion = Double.parseDouble(p.getProperty(HANDLE_ANSWER_KI,HANDLE_ANSWER_KI_PROPERTY_DEFAULT));
+		double handlePostproportion = Double.parseDouble(p.getProperty(HANDLE_POST_KI,HANDLE_POST_KI_PROPERTY_DEFAULT));
+		double handleReactproportion = Double.parseDouble(p.getProperty(HANDLE_REACT_KI,HANDLE_REACT_KI_PROPERTY_DEFAULT));
 
 		recordcount=Integer.parseInt(p.getProperty(Client.RECORD_COUNT_PROPERTY));
 		String requestdistrib=p.getProperty(REQUEST_DISTRIBUTION_PROPERTY,REQUEST_DISTRIBUTION_PROPERTY_DEFAULT);
@@ -329,6 +316,25 @@ public class CoreWorkload extends Workload
 			operationchooser.addValue(createKIReactproportion,"CREATE REACT KI");
 		}
 
+		if (handleAskproportion>0)
+		{
+			operationchooser.addValue(handleAskproportion,"HANDLE ASK KI");
+		}
+
+		if (handleAnswerproportion>0)
+		{
+			operationchooser.addValue(handleAnswerproportion,"HANDLE ANSWER KI");
+		}
+
+		if (handlePostproportion>0)
+		{
+			operationchooser.addValue(handlePostproportion,"HANDLE POST KI");
+		}
+
+		if (handleReactproportion>0)
+		{
+			operationchooser.addValue(handleReactproportion,"HANDLE REACT KI");
+		}
 
 		transactioninsertkeysequence=new CounterGenerator(recordcount);
 		if (requestdistrib.compareTo("uniform")==0)
@@ -430,29 +436,45 @@ public class CoreWorkload extends Workload
 	 * other, and it will be difficult to reach the target throughput. Ideally, this function would have no side
 	 * effects other than DB operations.
 	 */
-	public boolean doTransaction(KE db, Object threadstate)
+	public boolean doTransaction(KE ke, Object threadstate)
 	{
 		String op=operationchooser.nextString();
 
 		if (op.compareTo("CREATE ANSWER KI")==0)
 		{
-			doCreateAnswerKI(db);
+			doCreateAnswerKI(ke);
 		}
 		else if (op.compareTo("CREATE ASK KI")==0)
 		{
-			doCreateAskKI(db);
+			doCreateAskKI(ke);
 		}
 		else if (op.compareTo("CREATE REACT KI")==0)
 		{
-			doCreateReactKI(db);
+			doCreateReactKI(ke);
 		}
 		else if (op.compareTo("CREATE POST KI")==0)
 		{
-			doCreatePostKI(db);
+			doCreatePostKI(ke);
 		}
  		else if (op.compareTo("CREATE KNOWLEDGE BASE")==0)
 		{
-			doCreateKnowledgeBase(db);
+			doCreateKnowledgeBase(ke);
+		}
+		else if (op.compareTo("HANDLE ASK KI")==0)
+		{
+			doHandleAsk(ke);
+		}
+		else if (op.compareTo("HANDLE ANSWER KI")==0)
+		{
+			doHandleAnswer(ke);
+		}
+		else if (op.compareTo("HANDLE POST KI")==0)
+		{
+			doHandlePost(ke);
+		}
+		else if (op.compareTo("HANDLE REACT KI")==0)
+		{
+			doHandleReact(ke);
 		}
 
 		else
@@ -577,7 +599,7 @@ public class CoreWorkload extends Workload
 			keynum=Utils.hash(keynum);
 		}
 		String startkeyname="user"+keynum;
-		
+
 		//choose a random scan length
 		int len=scanlength.nextInt();
 
@@ -585,7 +607,7 @@ public class CoreWorkload extends Workload
 
 		if (!readallfields)
 		{
-			//read a random field  
+			//read a random field
 			String fieldname="field"+fieldchooser.nextString();
 
 			fields=new HashSet<String>();
@@ -704,7 +726,7 @@ public class CoreWorkload extends Workload
 	}
 
 	//insert
-	public void doCreateAnswerKI(KE db)
+	public void doCreateAnswerKI(KE ke)
 	{
 		//choose the next key
 		int keynum=transactioninsertkeysequence.nextInt();
@@ -723,15 +745,192 @@ public class CoreWorkload extends Workload
 		}
 
 		long st=System.currentTimeMillis();
-		db.createKnowledgeBase(table,dbkey,null,new HashMap<String,String>());
+		ke.createKnowledgeBase(table,dbkey,null,new HashMap<String,String>());
 		long en=System.currentTimeMillis();
 
 		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
 
 		st=System.currentTimeMillis();
-		db.createAnswerKI(table,dbkey,values);
+		ke.createAnswerKI(table,dbkey,values);
 		en=System.currentTimeMillis();
 
 		Measurements.getMeasurements().measure("CREATE ANSWER KI", (int)(en-st));
+	}
+
+	public void doHandleAsk(KE ke){
+		//choose the next key
+		int keynum=transactioninsertkeysequence.nextInt();
+		if (!orderedinserts)
+		{
+			keynum=Utils.hash(keynum);
+		}
+		String dbkey="user"+keynum;
+
+		HashMap<String,String> values=new HashMap<String,String>();
+		for (int i=0; i<fieldcount; i++)
+		{
+			String fieldkey="field"+i;
+			String data=Utils.ASCIIString(fieldlength);
+			values.put(fieldkey,data);
+		}
+
+		long st=System.currentTimeMillis();
+		ke.createKnowledgeBase(table,dbkey,null,new HashMap<String,String>());
+		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		ke.createAskKI(table,dbkey,values);
+		en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE ASK KI", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		ke.askBindingSet(table+dbkey,table+dbkey+"/interaction/"+table+dbkey);
+		en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("HANDLE ASK KI", (int)(en-st));
+	}
+
+	public void doHandleAnswer(KE ke){
+		//choose the next key
+		int keynum=transactioninsertkeysequence.nextInt();
+		if (!orderedinserts)
+		{
+			keynum=Utils.hash(keynum);
+		}
+		String dbkey="user"+keynum;
+
+		HashMap<String,String> values=new HashMap<String,String>();
+		for (int i=0; i<fieldcount; i++)
+		{
+			String fieldkey="field"+i;
+			String data=Utils.ASCIIString(fieldlength);
+			values.put(fieldkey,data);
+		}
+
+		long st=System.currentTimeMillis();
+		ke.createKnowledgeBase(table,dbkey,null,new HashMap<String,String>());
+		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		ke.createAnswerKI(table,dbkey,values);
+		en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE ANSWER KI", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		ke.handleAnswer(table+dbkey,table+dbkey);
+		en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("HANDLE ANSWER KI", (int)(en-st));
+	}
+
+	public void doHandlePost(KE ke){
+		//choose a random key
+		int keynum;
+		do
+		{
+			keynum=keychooser.nextInt();
+		}
+		while (keynum>transactioninsertkeysequence.lastInt());
+
+		if (!orderedinserts)
+		{
+			keynum=Utils.hash(keynum);
+		}
+		String startkeyname="user"+keynum;
+
+		//choose a random scan length
+		int len=scanlength.nextInt();
+
+		HashSet<String> fields=null;
+
+		if (!readallfields)
+		{
+			//read a random field
+			String fieldname="field"+fieldchooser.nextString();
+
+			fields=new HashSet<String>();
+			fields.add(fieldname);
+		}
+
+		long st=System.currentTimeMillis();
+		ke.createKnowledgeBase(table,startkeyname,null,new HashMap<String,String>());
+		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		ke.createPostKI(table,startkeyname,len,fields,new Vector<HashMap<String,String>>());
+
+		en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE POST KI", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		ke.postBindingSet(table+startkeyname,table+startkeyname+"/interaction/"+table+startkeyname);
+		en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("HANDLE POST KI", (int)(en-st));
+
+	}
+
+	public void doHandleReact(KE ke){
+		//choose a random key
+		int keynum;
+		do
+		{
+			keynum=keychooser.nextInt();
+		}
+		while (keynum>transactioninsertkeysequence.lastInt());
+
+		if (!orderedinserts)
+		{
+			keynum=Utils.hash(keynum);
+		}
+		String keyname="user"+keynum;
+
+		HashMap<String,String> values=new HashMap<String,String>();
+
+		if (writeallfields)
+		{
+			//new data for all the fields
+			for (int i=0; i<fieldcount; i++)
+			{
+				String fieldname="field"+i;
+				String data=Utils.ASCIIString(fieldlength);
+				values.put(fieldname,data);
+			}
+		}
+		else
+		{
+			//update a random field
+			String fieldname="field"+fieldchooser.nextString();
+			String data=Utils.ASCIIString(fieldlength);
+			values.put(fieldname,data);
+		}
+
+		long st=System.currentTimeMillis();
+		ke.createKnowledgeBase(table,keyname,null,new HashMap<String,String>());
+		long en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE KNOWLEDGE BASE", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		ke.createReactKI(table,keyname,values);
+		en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("CREATE REACT KI", (int)(en-st));
+
+		st=System.currentTimeMillis();
+		ke.handleReact(table+keyname,table+keyname);
+		en=System.currentTimeMillis();
+
+		Measurements.getMeasurements().measure("HANDLE REACT KI", (int)(en-st));
+
 	}
 }

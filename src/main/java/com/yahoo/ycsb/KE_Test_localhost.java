@@ -4,9 +4,9 @@ import com.yahoo.ycsb.schemes.*;
 
 import java.util.*;
 
-public class KE_Test_96 extends KE{
+public class KE_Test_localhost extends KE{
 
-    private String KE_HOST="http://192.168.112.96:8280/rest";
+    private String KE_HOST="http://localhost:8280/rest";
     private static KEClient keClient;
 
     public static final int OK=0;
@@ -22,7 +22,7 @@ public class KE_Test_96 extends KE{
     @Override
     public int createKnowledgeBase(String table, String key, Set<String> fields, HashMap<String, String> result) {
         System.out.println("I am a create KnowledgeBase Operation");
-        //CreateSmartConnector createSmartConnector = new CreateSmartConnector(table+key+randomString(),table+key,"test"+key,leaseRenewalTime,reasonerEnabled);
+        //CreateSmartConnector createSmartConnector = new CreateSmartConnector(table+key,table+key,"test"+key,leaseRenewalTime,reasonerEnabled);
         CreateSmartConnectorNoLease createSmartConnector = new CreateSmartConnectorNoLease(table+key,table+key,"test"+key,reasonerEnabled);
         int rep = keClient.createSmartConnector(createSmartConnector);
         if(rep==200){
@@ -38,6 +38,7 @@ public class KE_Test_96 extends KE{
     @Override
     public int createPostKI(String table, String startkey, int recordcount, Set<String> fields, Vector<HashMap<String, String>> result) {
         System.out.println("I am a create PostKI Operation");
+        System.out.println("[create Post] KI: "+table+startkey);
         CommunicativeAct act = new CommunicativeAct();
         List<String> purposes = new ArrayList<String>();
         purposes.add("String");
@@ -123,10 +124,10 @@ public class KE_Test_96 extends KE{
         return 0;
     }
 
-
     @Override
     public int postBindingSet(String knowledgeBase, String knowledgeInteraction) {
         System.out.println("I am a handle Post Operation");
+        System.out.println("[handle Post] KI: "+knowledgeInteraction);
         int rep = keClient.post(knowledgeBase,knowledgeInteraction, keClient.getBindingSetJSON());
         if(rep==200){
             System.out.println("200");
@@ -156,7 +157,7 @@ public class KE_Test_96 extends KE{
     public int handleReact(String knowledgeBase, String knowledgeInteraction) {
         System.out.println("I am a handle React Operation");
         int rep = keClient.startWaitingForHandleRequest(knowledgeBase);
-        if(rep==200){
+        if(rep==200 || rep ==202){
             System.out.println("200");
             return OK;
         }
@@ -170,7 +171,7 @@ public class KE_Test_96 extends KE{
     public int handleAnswer(String knowledgeBase, String knowledgeInteraction) {
         System.out.println("I am a handle Answer Operation");
         int rep = keClient.startWaitingForHandleRequest(knowledgeBase);
-        if(rep==200){
+        if(rep==200 || rep==202){
             System.out.println("200");
             return OK;
         }
@@ -181,19 +182,4 @@ public class KE_Test_96 extends KE{
     }
 
 
-
-
-    private static String randomString(){
-        int leftLimit = 48; // numeral '0'
-        int rightLimit = 122; // letter 'z'
-        int targetStringLength = 10;
-        Random random = new Random();
-
-        String generatedString = random.ints(leftLimit, rightLimit + 1)
-                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
-        return generatedString;
-    }
 }

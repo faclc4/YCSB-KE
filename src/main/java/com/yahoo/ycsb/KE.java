@@ -146,4 +146,33 @@ public abstract class KE
 	 * @return Zero on success, a non-zero error code on error.  See this class's description for a discussion of error codes.
 	 */
 	public abstract int deleteKnowledgeBase(String table, String key);
+
+	/**
+	 * Trigger the POST KI to send data - predefined BindingSet.
+	 * @return
+	 */
+	public abstract int postBindingSet(String knowledgeBase,String knowledgeInteraction);
+
+	/**
+	 * Trigger the ASK KI to request data - predefined BindingSet.
+	 * @return
+	 */
+	public abstract int askBindingSet(String knowledgeBase,String knowledgeInteraction);
+
+	/**
+	 * Trigger the React KI to handle data.
+	 * @return
+	 */
+	public abstract int handleReact(String knowledgeBase,String knowledgeInteraction);
+
+
+	/**
+	 * Trigger the Answer KI to handle data.
+	 * @return
+	 */
+	public abstract int handleAnswer(String knowledgeBase,String knowledgeInteraction);
+
+
+
+
 }
