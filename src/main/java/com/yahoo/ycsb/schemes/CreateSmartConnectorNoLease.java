@@ -1,6 +1,6 @@
 /**
  * Copyright [2020-2022] INESC TEC and VIZLORE Labs Foundation
- *
+ * InterConnect Generic Adapter
  * This software is authored by:
  * Aleksandar Tomcic (VIZLORE Labs Foundation)
  * Fábio André Castanheira Luís Coelho (INESC TEC)
